@@ -1,59 +1,27 @@
 class Solution {
 public:
-
-    bool dfs(vector<vector<int>>& adj, int u,
-             vector<bool>& vis,
-             vector<bool>& cur,
-             stack<int>& st) {
-
-        vis[u] = true;
-        cur[u] = true;
-
-        for (int x : adj[u]) {
-
-            if (!vis[x]) {
-                if (!dfs(adj, x, vis, cur, st))
-                    return false;
-            }
-            else if (cur[x]) {
-                return false;  // cycle
-            }
+    vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites) {
+        vector<int>indegree(numCourses,0);
+        vector<vector<int>>adj(numCourses);
+        for(int i=0;i<prerequisites.size();i++){
+            adj[prerequisites[i][1]].push_back(prerequisites[i][0]);
         }
-
-        cur[u] = false;
-        st.push(u);
-
-        return true;
-    }
-
-    vector<int> findOrder(int numCourses,
-                           vector<vector<int>>& prerequisites) {
-
-        vector<vector<int>> adj(numCourses);
-
-        for (auto &p : prerequisites) {
-            adj[p[1]].push_back(p[0]);
+        for(int i=0;i<adj.size();i++){
+            for(int &u:adj[i])indegree[u]++;
         }
-
-        vector<bool> vis(numCourses, false);
-        vector<bool> cur(numCourses, false);
-
-        stack<int> st;
-
-        for (int i = 0; i < numCourses; i++) {
-            if (!vis[i]) {
-                if (!dfs(adj, i, vis, cur, st))
-                    return {};
+        queue<int>q;
+        for(int i=0;i<indegree.size();i++)if(indegree[i]==0)q.push(i);
+        vector<int>ans;
+        while(!q.empty()){
+            int cur=q.front();
+            q.pop();
+            ans.push_back(cur);
+            for(int &x:adj[cur]){
+                indegree[x]--;
+                if(indegree[x]==0)q.push(x);
             }
         }
-
-        vector<int> ans;
-
-        while (!st.empty()) {
-            ans.push_back(st.top());
-            st.pop();
-        }
-
+        if(ans.size()!=numCourses)return {};
         return ans;
     }
 };
