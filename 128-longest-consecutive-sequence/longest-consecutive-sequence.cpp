@@ -1,26 +1,40 @@
 class Solution {
 public:
-typedef long long int;
     int longestConsecutive(vector<int>& nums) {
-        int ans=0;
-        int n=nums.size();
-        unordered_set<int> mp;
-        for(int x:nums)mp.insert(x);
-        for(int x:  mp){
-           
-            if(mp.count(x-1)){
-               // mp[x]++;
+        if (nums.empty())
+            return 0;
+
+        priority_queue<int, vector<int>> pq;
+
+        for (int x : nums) {
+            pq.push(x);
+        }
+
+        int answer = 1;
+        int count = 1;
+
+        int previous = pq.top();
+        pq.pop();
+
+        while (!pq.empty()) {
+            int current = pq.top();
+            pq.pop();
+
+            if (current == previous) {
                 continue;
             }
-            else{
-                int cnt=0;
-                while(mp.count(x)){
-                    cnt++;
-                    ans=max(ans,cnt);
-                    x++;
-                }
+
+            if (current == previous - 1) {
+                count++;
             }
+            else {
+                count = 1;
+            }
+
+            answer = max(answer, count);
+            previous = current;
         }
-        return ans;
+
+        return answer;
     }
 };
